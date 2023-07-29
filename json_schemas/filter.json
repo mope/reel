@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Filter",
+  "type": "object",
+  "properties": {
+    "ids": {
+      "type": "array",
+      "description": "A list of event ids or prefixes to filter by",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "authors": {
+        "type": "array",
+        "description": "A list of pubkeys or prefixes to filter by",
+        "items": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+      },
+      "kinds": {
+        "type": "array",
+        "description": "A list of event kind numbers to filter by",
+        "items": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        }
+      },
+      "#e": {
+        "type": "array",
+        "description": "A list of event ids that are referenced in an \"e\" tag",
+        "items": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "#p": {
+        "type": "array",
+        "description": "A list of pubkeys that are referenced in a \"p\" tag",
+        "items": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "since": {
+        "type": "integer",
+        "description": "An integer Unix timestamp in seconds, events must be newer than this to pass",
+        "minimum": 0
+      },
+      "until": {
+        "type": "integer",
+        "description": "An integer Unix timestamp in seconds, events must be older than this to pass",
+        "minimum": 0
+      },
+      "limit": {
+        "type": "integer",
+        "description": "The maximum number of events to return in the initial response",
+        "minimum": 0
+      }
+    }
+  },
+  "additionalProperties": false
+}

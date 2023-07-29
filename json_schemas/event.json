@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Event",
+  "type": "object",
+  "required": ["id", "pubkey", "created_at", "kind", "tags", "content", "sig"],
+  "properties": {
+    "id": {
+      "description": "32-bytes lowercase hex-encoded sha256 of the serialized event data",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "pubkey": {
+      "description": "32-bytes lowercase hex-encoded public key of the event creator",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "created_at": {
+      "description": "unix timestamp in seconds",
+      "type": "integer",
+      "minimum": 0
+    },
+    "tags": {
+      "description": "what kind of event it is",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "description": "positional event id tag",
+            "type": "array",
+            "prefixItems": [
+              { "const": "e" },
+              { "type": "string", "pattern": "^[0-9a-f]{64}$"}
+            ],
+            "items": { "type": "string", "format": "uri" },
+            "maxItems": 3
+          },
+          {
+            "description": "marked event id tag",
+            "type": "array",
+            "prefixItems": [
+              { "const": "e"},
+              { "type": "string", "pattern": "^[0-9a-f]{64}$"},
+              { "oneOf": [{ "type": "string", "format": "uri" }, { "const": "" }] },
+              {
+                "oneOf": [
+                  { "const": "reply" },
+                  { "const": "root" },
+                  { "const": "mention" }
+                ]
+              }
+            ],
+            "items": false
+          },
+          {
+            "description": "pubkey tag",
+            "type": "array",
+            "prefixItems": [
+              { "const": "p" }
+            ],
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ]
+      },
+      "sig": {
+        "description": "64-bytes hex of the signature of the sha256 hash of the serialized event data, which is the same as the \"id\" field",
+        "type": "string",
+        "pattern": "[0-9a-f]{128}"
+      },
+      "kind": {
+        "oneOf": [
+          {
+            "description": "set_metadata",
+            "const": 0
+          },
+          {
+            "description": "text_note",
+            "const": 1
+          },
+          {
+            "description": "recommended_server",
+            "const": 2
+          }
+        ]
+      },
+      "content": {
+        "description": "the body of the note",
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  }
+}
