@@ -1,11 +1,11 @@
 db = db.getSiblingDB("reel")
 
-db.createCollection("metadata", {
+db.createCollection("set_metadata", {
   validator: {
     $jsonSchema: {
       bsonType: "object",
       title: "Event validation",
-      required: ["id", "pubKey", "created_at", "kind", "tags", "content", "sig"],
+      required: ["id", "pubkey", "created_at", "kind", "tags", "content", "sig"],
       properties: {
         "_id": {
           description: "the Mongo document ID",
@@ -23,7 +23,7 @@ db.createCollection("metadata", {
         },
         created_at: {
           description: "unix timestamp in seconds",
-          bsonType: "date",
+          bsonType: "int",
         },
         tags: {
           description: "tags",
@@ -42,7 +42,7 @@ db.createCollection("metadata", {
         },
         kind: {
           description: "set_metadata",
-          bsonType: "string"
+          bsonType: "int"
         },
         content: {
           description: "the body of the note",
@@ -73,7 +73,7 @@ db.createCollection("text_note", {
     $jsonSchema: {
       bsonType: "object",
       title: "Event validation",
-      required: ["id", "pubKey", "created_at", "kind", "tags", "content", "sig"],
+      required: ["id", "pubkey", "created_at", "kind", "tags", "content", "sig"],
       properties: {
         "_id": {
           description: "the Mongo document ID",
@@ -91,10 +91,10 @@ db.createCollection("text_note", {
         },
         created_at: {
           description: "unix timestamp in seconds",
-          bsonType: "date",
+          bsonType: "int",
         },
         tags: {
-          description: "what kind of event it is",
+          description: "tags",
           bsonType: "array",
           items: {
             bsonType: "array",
@@ -110,7 +110,7 @@ db.createCollection("text_note", {
         },
         kind: {
           description: "text_note",
-          bsonType: "string"
+          bsonType: "int"
         },
         content: {
           description: "the body of the note",
@@ -127,7 +127,7 @@ db.createCollection("recommended_server", {
     $jsonSchema: {
       bsonType: "object",
       title: "Event validation",
-      required: ["id", "pubKey", "created_at", "kind", "tags", "content", "sig"],
+      required: ["id", "pubkey", "created_at", "kind", "tags", "content", "sig"],
       properties: {
         "_id": {
           description: "the Mongo document ID",
@@ -145,10 +145,10 @@ db.createCollection("recommended_server", {
         },
         created_at: {
           description: "unix timestamp in seconds",
-          bsonType: "date",
+          bsonType: "int",
         },
         tags: {
-          description: "what kind of event it is",
+          description: "tags",
           bsonType: "array",
           items: {
             bsonType: "array",
@@ -163,12 +163,8 @@ db.createCollection("recommended_server", {
           pattern: "[0-9a-f]{128}"
         },
         kind: {
-          oneOf: [
-            {
-              description: "recommended_server",
-              bsonType: "string"
-            }
-          ]
+          description: "recommended_server",
+          bsonType: "int"
         },
         content: {
           description: "the body of the note",

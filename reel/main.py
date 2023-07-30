@@ -1,14 +1,20 @@
 import json
 from json.decoder import JSONDecodeError
+import os
 
 from jsonschema import validate, ValidationError
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
+from motor import motor_asyncio
 
 app = FastAPI()
 
 
+MONGODB_CONNECTION_STRING = os.environ["MONGODB_CONNECTION_STRING"]
+MONGODB_DATABASE_NAME = os.environ["MONGODB_DATABASE_NAME"]
 
+client = motor_asyncio.AsyncIOMotorClient(MONGODB_CONNECTION_STRING)
+db = client[MONGODB_DATABASE_NAME]
 
 html = """
 <!DOCTYPE html>
@@ -57,14 +63,28 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_text()
+
         try:
             message = json.loads(data)
-            validate(message, event_schema)
-        except (ValidationError, JSONDecodeError) as error:
-            await websocket.send_text(f"Invalid message: {error}")
+        except JSONDecodeError:
+            await websocket.send_text("Invalid message: not JSON")
             continue
+
         match message:
             case ["EVENT", event]:
+                try:
+                    validate(event, event_schema)
+                except ValidationError as error:
+                    await websocket.send_text(f"Invalid event: {error}")
+                    continue
+
+                match event["kind"]:
+                    case 0:
+                        await db.set_metadata.insert_one(event)
+                    case 1:
+                        await db.text_note.insert_one(event)
+                    case 2:
+                        await db.recommended_server.insert_one(event)
                 print(f"Received event {event}")
             case ["REQ", subscription_id, filters]:
                 print(f"Received request {subscription_id} with filters {filters}")
